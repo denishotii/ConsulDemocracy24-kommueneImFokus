@@ -128,13 +128,9 @@ def content_scraper(soup, links, identifier):
                     text_content = content.get_text(strip=True)
                 case 'ilzerland':
                     title = soup.find_all('title')
-<<<<<<< HEAD
-                    content = soup.find_all('div', class_='custom-page-content')
-=======
                     print(title)
                     content = soup.find_all('div', class_='custom-page-content')
                     print(content)
->>>>>>> 402f046 (Seperate py)
                     text_content = title[0].get_text(strip=True) + ': ' + content[0].get_text(strip=True)
                 
                 case _:
