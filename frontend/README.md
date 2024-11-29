@@ -1,70 +1,86 @@
-# Getting Started with Create React App
+# ConsulDemocracy24 | Kommune Im Fokus
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Table of Contents
+- [Introduction](#introduction)
+- [Project Structure](#project-structure)
+- [Project Organization](#project-organization)
+- [Technologies Used](#technologies-used)
+- [Setup Instructions](#setup-instructions)
+- [Usage](#usage)
+    - [Web Application](#web-application)
+- [Collaborators](#collaborators)
 
-## Available Scripts
+## Introduction
+Citizen participation is a cornerstone of transparent and effective governance, yet many municipalities face challenges in achieving meaningful engagement. Barriers such as low accessibility to decision-making platforms, limited public awareness, and fragmented understanding of public sentiment hinder inclusive and data-driven decision-making.
 
-In the project directory, you can run:
+The Consul Democracy platform offers a solution by enabling municipalities to involve citizens in city projects, budgeting, and planning. However, the platform's success relies on understanding how effectively it is being used and how engaged the citizens are.
 
-### `npm start`
+This project addresses the problem by analyzing the platform’s content and usage patterns. It provides municipalities with actionable insights to improve project proposals, better involve residents, and understand public sentiment. Ultimately, this analysis benefits both governing bodies and citizens by fostering a more participatory and informed approach to civic decision-making.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Frontend Project Structure
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- `src/App.js`: The main React component for the application.
+- `src/server.js`: The Express server handling API requests.
+- `public/`: Directory containing the public assets and HTML file.
+- `src/`: Directory containing the React components and server code.
 
-### `npm test`
+## Frontend Project Organization
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+    ├── public                  <- Directory containing the public assets and HTML file
+    ├── src                     <- Directory containing the React components and server code
+    │   ├── App.js              <- Main React component
+    │   ├── server.js           <- Express server handling API requests
+    ├── README.md               <- The top-level README for developers using this project.
+    ├── package.json            <- Node.js dependencies and scripts
+    └── .gitignore              <- Git ignore file
 
-### `npm run build`
+## Technologies Used
+- **React**: A JavaScript library for building user interfaces.
+- **Express**: A web application framework for Node.js.
+- **Axios**: A promise-based HTTP client for the browser and Node.js.
+- **React Icons**: Include popular icons in your React projects easily.
+- **Body-Parser**: Node.js body parsing middleware.
+- **Node.js**: JavaScript runtime built on Chrome's V8 JavaScript engine.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Setup Instructions
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. **Clone the repository:**
+    ```bash
+    git clone https://github.com/denishotii/ConsulDemocracy24-kommueneImFokus.git
+    ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. **Navigate to the frontend directory:**
+    ```bash
+    cd ConsulDemocracy24-kommueneImFokus/frontend
+    ```
 
-### `npm run eject`
+3. **Install the packages:**
+    ```bash
+    npm install
+    ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+4. **Start the frontend application:**
+    ```bash
+    npm start
+    ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+5. **Run the API server:**
+    ```bash
+    node src/server.js
+    ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Conclusion
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+The analysis of the Consul Democracy platform provides valuable insights into how residents engage in decision-making processes for city projects, budgets, and planning. This analysis offers municipalities actionable data to improve their project proposals and foster greater citizen involvement in decision-making.
 
-## Learn More
+For the organization, this work sheds light on platform usage patterns across different cities, creating well-structured datasets and offering deeper insights into how cities leverage the Consul Democracy platform.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+For citizens, the platform serves as a valuable resource to understand public opinion on specific projects and assess their own level of involvement in civic decisions. By enhancing transparency and inclusivity, this analysis contributes to building more participatory and effective governance.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Collaborators
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- [Denis Hoti](https://www.linkedin.com/in/denishoti/)
+- [Veronika Rybak](https://www.linkedin.com/in/veronika-rybak-55379a337/)
+- [Ali Guliyev](https://www.linkedin.com/in/ali-guliyev-389837238/)
+- [Ruslan Tsibirov](https://www.linkedin.com/in/ruslan-tsibirov-6bb6a2262/)
+- [Jessica-Maria Mihaila](#)
