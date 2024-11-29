@@ -2,9 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 
 urls = [
-    #'https://mitmachen.siegburg.de/angebotslandkarte',
+    'https://mitmachen.siegburg.de/angebotslandkarte',
     'https://mitmachen.jena.de/projekts',
-    #'https://mitreden.ilzerland.bayern/projekts'
+    'https://mitreden.ilzerland.bayern/projekts'
 ]
 
 def def_42(urls):
@@ -73,19 +73,18 @@ def jena_data(soup):
 def ilzerland_data(soup):
     links = []
 
-    a_tags = soup.find_all('a',  class_='resources-list--inner')
+    a_tags = soup.find_all('a',  class_='resource-item--title')
 
     for tag in a_tags:
         href = tag.get('href')
         
         if href:
-            link = 'https://mitmachen.ilzerland.de' + href
-            
+            link = 'https://mitreden.ilzerland.bayern' + href
             if not link in links:
                 links.append(link)
     
     link_and_content = content_scraper(soup, links, 'ilzerland')
-    print(link_and_content)
+    
     return link_and_content
 
 def content_scraper(soup, links, identifier):
@@ -110,9 +109,7 @@ def content_scraper(soup, links, identifier):
                     text_content = content.get_text(strip=True)
                 case 'ilzerland':
                     title = soup.find_all('title')
-                    print(title)
                     content = soup.find_all('div', class_='custom-page-content')
-                    print(content)
                     text_content = title[0].get_text(strip=True) + ': ' + content[0].get_text(strip=True)
                 
                 case _:
