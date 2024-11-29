@@ -3,9 +3,15 @@ from bs4 import BeautifulSoup
 
 urls = [
 <<<<<<< HEAD
+<<<<<<< HEAD
     'https://mitmachen.siegburg.de/angebotslandkarte',
     'https://mitmachen.jena.de/projekts',
     'https://mitreden.ilzerland.bayern/projekts'
+=======
+    #'https://mitmachen.siegburg.de/angebotslandkarte',
+    'https://mitmachen.jena.de/projekts',
+    #'https://mitreden.ilzerland.bayern/projekts'
+>>>>>>> 402f046 (Seperate py)
 =======
     #'https://mitmachen.siegburg.de/angebotslandkarte',
     'https://mitmachen.jena.de/projekts',
@@ -80,7 +86,11 @@ def ilzerland_data(soup):
     links = []
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     a_tags = soup.find_all('a',  class_='resource-item--title')
+=======
+    a_tags = soup.find_all('a',  class_='resources-list--inner')
+>>>>>>> 402f046 (Seperate py)
 =======
     a_tags = soup.find_all('a',  class_='resources-list--inner')
 >>>>>>> 402f046 (Seperate py)
@@ -90,7 +100,12 @@ def ilzerland_data(soup):
         
         if href:
 <<<<<<< HEAD
+<<<<<<< HEAD
             link = 'https://mitreden.ilzerland.bayern' + href
+=======
+            link = 'https://mitmachen.ilzerland.de' + href
+            
+>>>>>>> 402f046 (Seperate py)
 =======
             link = 'https://mitmachen.ilzerland.de' + href
             
@@ -100,7 +115,11 @@ def ilzerland_data(soup):
     
     link_and_content = content_scraper(soup, links, 'ilzerland')
 <<<<<<< HEAD
+<<<<<<< HEAD
     
+=======
+    print(link_and_content)
+>>>>>>> 402f046 (Seperate py)
 =======
     print(link_and_content)
 >>>>>>> 402f046 (Seperate py)
