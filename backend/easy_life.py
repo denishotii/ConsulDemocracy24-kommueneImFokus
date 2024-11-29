@@ -2,9 +2,15 @@ import requests
 from bs4 import BeautifulSoup
 
 urls = [
+<<<<<<< HEAD
     'https://mitmachen.siegburg.de/angebotslandkarte',
     'https://mitmachen.jena.de/projekts',
     'https://mitreden.ilzerland.bayern/projekts'
+=======
+    #'https://mitmachen.siegburg.de/angebotslandkarte',
+    'https://mitmachen.jena.de/projekts',
+    #'https://mitreden.ilzerland.bayern/projekts'
+>>>>>>> 402f046 (Seperate py)
 ]
 
 def def_42(urls):
@@ -73,18 +79,31 @@ def jena_data(soup):
 def ilzerland_data(soup):
     links = []
 
+<<<<<<< HEAD
     a_tags = soup.find_all('a',  class_='resource-item--title')
+=======
+    a_tags = soup.find_all('a',  class_='resources-list--inner')
+>>>>>>> 402f046 (Seperate py)
 
     for tag in a_tags:
         href = tag.get('href')
         
         if href:
+<<<<<<< HEAD
             link = 'https://mitreden.ilzerland.bayern' + href
+=======
+            link = 'https://mitmachen.ilzerland.de' + href
+            
+>>>>>>> 402f046 (Seperate py)
             if not link in links:
                 links.append(link)
     
     link_and_content = content_scraper(soup, links, 'ilzerland')
+<<<<<<< HEAD
     
+=======
+    print(link_and_content)
+>>>>>>> 402f046 (Seperate py)
     return link_and_content
 
 def content_scraper(soup, links, identifier):
@@ -109,7 +128,13 @@ def content_scraper(soup, links, identifier):
                     text_content = content.get_text(strip=True)
                 case 'ilzerland':
                     title = soup.find_all('title')
+<<<<<<< HEAD
                     content = soup.find_all('div', class_='custom-page-content')
+=======
+                    print(title)
+                    content = soup.find_all('div', class_='custom-page-content')
+                    print(content)
+>>>>>>> 402f046 (Seperate py)
                     text_content = title[0].get_text(strip=True) + ': ' + content[0].get_text(strip=True)
                 
                 case _:
