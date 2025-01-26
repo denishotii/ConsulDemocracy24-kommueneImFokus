@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ data.city }} Civic Engagement Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Asap:wght@400;700&family=Source+Sans+Pro:wght@400;700&family=PI+Serif&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='consul-logo.png') }}" alt="Consul Logo" class="logo">
+        <h1>{{ data.city }} Civic Engagement Report</h1>
+    </header>
+
+    <div class="container">
+        <!-- Summary and AI Insights -->
+        <div class="summary-section">
+            <h2 class="summary-header">{{ data.summary }}</h2>
+            <p class="ai-insights">{{ data.ai_insights }}</p>
+            <p class="report-date">{{ data.date }}</p>
+        </div>
+
+        <!-- Stats Blocks -->
+        <div class="stats-blocks">
+            <div class="stat-block">
+                <h3>Most Popular Time</h3>
+                <p>{{ data.peak_hours }}</p>
+            </div>
+            <div class="stat-block">
+                <h3>Most Popular Day</h3>
+                <p>{{ data.peak_days }}</p>
+            </div>
+            <div class="stat-block">
+                <h3>Most Discussed Topics</h3>
+                <p>{{ data.most_discussed_topics }}</p>
+            </div>
+        </div>
+
+        <!-- Most Liked Comments -->
+        <h2>Most Liked Comments</h2>
+        <div class="comments">
+            {% for comment in data.most_liked_comments %}
+                <div class="comment">
+                    <p class="comment-text">{{ comment.Text }}</p>
+                    <div class="comment-details">
+                        <span class="author">{{ comment.Username }}</span>
+                        <span class="likes">👍 {{ comment['Total Votes'] }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Most Supported Proposals -->
+        <h2>Most Supported Proposals</h2>
+        <ul>
+            {% for proposal in data.most_supported_proposals %}
+                <li>{{ proposal.Title }} ({{ proposal.Supporters }} supporters)</li>
+            {% endfor %}
+        </ul>
+
+        <!-- Most Controversial Comments -->
+        <h2>Most Controversial Comments</h2>
+        <div class="comments">
+            {% for comment in data.most_controversial_comments %}
+                <div class="comment">
+                    <p class="comment-text">{{ comment.Text }}</p>
+                    <div class="comment-details">
+                        <span class="author">{{ comment.Username }}</span>
+                        <span class="likes">👍 {{ comment['Total Votes'] }}</span>
+                        <span class="dislikes">👎 {{ comment.Dislikes }}</span>
+                        <span class="controversy">Controversy Score: {{ comment.Controversy | round(2) }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Plots -->
+        <h2>Wordcloud</h2>
+        <img src="{{ url_for('static', filename=data.wordcloud_path) }}" alt="Wordcloud" class="plot">
+
+        <h2>Active Users Over Time</h2>
+        <img src="{{ url_for('static', filename=data.active_users_plot_path) }}" alt="Active Users Plot" class="plot">
+
+        <h2>Sentiment Distribution</h2>
+        <img src="{{ url_for('static', filename=data.sentiment_plot_path) }}" alt="Sentiment Distribution Plot" class="plot">
+
+        <!-- Download Link -->
+        <a href="{{ url_for('download_report', city=data.city) }}" download class="download-link">Download Report</a>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Consul. All rights reserved. | <a href="#">Contact Us</a></p>
+    </footer>
+</body>
+</html>
