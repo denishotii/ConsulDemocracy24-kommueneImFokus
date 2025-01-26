@@ -1,16 +1,19 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, url_for
 import os
 import pandas as pd
 from datetime import datetime
 import locale
 from jinja2 import Environment, FileSystemLoader
-from premailer import Premailer  # For inlining CSS
-
+import pdfkit
 
 # Set locale to German for month names
 locale.setlocale(locale.LC_TIME, "de_DE")
 
 app = Flask(__name__)
+
+# Specify the path to wkhtmltopdf
+wkhtmltopdf_path = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'  # Update this path
+pdfkit_config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
 
 # List of cities (excluding Flensburg)
 CITIES = [
@@ -60,9 +63,45 @@ def index():
 
 @app.route("/download/<city>")
 def download_report(city):
-    # Ensure the file path includes the .html extension
-    html_file_path = f"templates/{city}_report.html"
-    return send_file(html_file_path, as_attachment=True)
+    # Generate the report data for the selected city
+    city_projects = projects_df[projects_df["City"] == city]
+    city_proposals = proposals_df[proposals_df["City"] == city]
+    city_comments = comments_df[comments_df["City"] == city]
+
+    data = {
+        "city": city,
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "summary": f"This is a summary of civic engagement in {city}.",
+        "ai_insights": f"AI-generated insights about civic engagement in {city}.",
+        "most_discussed_topics": get_most_discussed_topics(city_comments),
+        "most_liked_comments": get_most_liked_comments(city_comments),
+        "peak_hours": get_peak_hours(city_comments),
+        "peak_days": get_peak_days(city_comments),
+        "most_supported_proposals": get_most_supported_proposals(city_proposals),
+        "most_controversial_comments": get_most_controversial_comments(city_comments),
+        "wordcloud_path": f"static/{city}_wordcloud.png",  # Example path
+        "active_users_plot_path": f"static/{city}_active_users.png",  # Example path
+        "sentiment_plot_path": f"static/{city}_sentiment_distribution.png",  # Example path
+    }
+
+    # Create a Jinja2 environment and pass the url_for function
+    env = Environment(loader=FileSystemLoader('templates'))
+    env.globals['url_for'] = url_for  # Make url_for available in the template
+
+    # Render the HTML content
+    template = env.get_template('report_template.html')
+    html_out = template.render(data=data)
+
+    # Convert HTML to PDF
+    pdf_file_path = f"templates/{city}_report.pdf"
+    pdfkit.from_string(html_out, pdf_file_path, configuration=pdfkit_config, options={
+        'quiet': '',
+        'enable-local-file-access': '',  # Allow access to local files
+        'no-pdf-compression': '',  # Disable PDF compression
+    })
+
+    # Send the PDF file for download
+    return send_file(pdf_file_path, as_attachment=True)
 
 # Helper functions to generate statistics
 def get_most_discussed_topics(comments_df):
