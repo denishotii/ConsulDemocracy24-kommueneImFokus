@@ -294,3 +294,54 @@ footer a:hover {
 .download-link:hover {
     transform: scale(1.02); /* Slight size increase */
 }
+
+
+.comment-link {
+    color: #007BFF;
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+.comment-link:hover {
+    text-decoration: underline;
+}
+
+/* Proposals Container */
+.proposals-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Space between proposals */
+    margin: 20px 0;
+}
+
+/* Individual Proposal */
+.proposal {
+    background-color: #f1f1f1; /* Gray background */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth hover effect */
+}
+
+.proposal:hover {
+    transform: scale(1.02); /* Slight zoom effect on hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+/* Proposal Title */
+.proposal-title {
+    font-size: 1.1rem; /* Slightly larger font */
+    color: #007BFF; /* Link color */
+    text-decoration: none; /* Remove underline */
+}
+
+.proposal-title:hover {
+    text-decoration: underline; /* Add underline on hover */
+}
+
+/* Supporters Text */
+.supporters {
+    font-size: 1rem; /* Slightly smaller font */
+    color: #555; /* Muted color for supporters */
+    margin-left: 10px; /* Space between title and supporters */
+}

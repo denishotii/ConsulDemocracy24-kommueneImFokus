@@ -105,44 +105,99 @@ def download_report(city):
 
 # Helper functions to generate statistics
 def get_most_discussed_topics(comments_df):
-    # Example: Extract most frequent words from comments
-    from collections import Counter
-    import re
+    try:
+        # Check if the DataFrame is empty or has no "Text" column
+        if comments_df.empty or "Text" not in comments_df.columns:
+            return "Not enough data available yet. Metrics will appear as more users become active."
 
-    words = " ".join(comments_df["Text"].dropna()).lower()
-    words = re.findall(r'\b\w+\b', words)
-    word_counts = Counter(words).most_common(5)
-    return ", ".join([word for word, count in word_counts])
+        from collections import Counter
+        import re
+
+        words = " ".join(comments_df["Text"].dropna()).lower()
+        words = re.findall(r'\b\w+\b', words)
+
+        # Check if there are any words
+        if not words:
+            return "No topics available for analysis."
+
+        word_counts = Counter(words).most_common(5)
+        return ", ".join([word for word, count in word_counts])
+    except Exception as e:
+        return f"An error occurred while calculating most discussed topics: {str(e)}"
 
 def get_most_liked_comments(comments_df):
-    # Example: Find the most liked comments
-    most_liked = comments_df.nlargest(3, "Total Votes")
-    return most_liked[["Text", "Total Votes", "Username"]].to_dict("records")
+    try:
+        # Check if the DataFrame is empty or has no "Total Votes" column
+        if comments_df.empty or "Total Votes" not in comments_df.columns:
+            return [{"Text": "Not enough data available yet.", "Total Votes": 0, "Username": "N/A", "URL": "#"}]
+
+        most_liked = comments_df.nlargest(5, "Total Votes")
+        return most_liked[["Text", "Total Votes", "Username", "URL"]].to_dict("records")
+    except Exception as e:
+        return [{"Text": f"An error occurred: {str(e)}", "Total Votes": 0, "Username": "N/A", "URL": "#"}]
 
 def get_peak_hours(comments_df):
-    # Parse dates with the correct format
-    comments_df["Date"] = pd.to_datetime(comments_df["Date"], format="%d. %B %Y %H:%M:%S")
-    comments_df["Hour"] = comments_df["Date"].dt.hour
-    peak_hours = comments_df["Hour"].value_counts().idxmax()
-    return f"Most comments were posted at {peak_hours}:00."
+    try:
+        # Check if the DataFrame is empty or has no "Date" column
+        if comments_df.empty or "Date" not in comments_df.columns:
+            return "Not enough data available yet. Metrics will appear as more users become active."
+
+        # Parse dates with the correct format
+        comments_df["Date"] = pd.to_datetime(comments_df["Date"], format="%d. %B %Y %H:%M:%S")
+        comments_df["Hour"] = comments_df["Date"].dt.hour
+
+        # Check if there are any valid hours
+        if comments_df["Hour"].empty:
+            return "No valid time data available."
+
+        peak_hours = comments_df["Hour"].value_counts().idxmax()
+        return f"Most comments were posted at {peak_hours}:00."
+    except Exception as e:
+        return f"An error occurred while calculating peak hours: {str(e)}"
 
 def get_peak_days(comments_df):
-    # Parse dates with the correct format
-    comments_df["Date"] = pd.to_datetime(comments_df["Date"], format="%d. %B %Y %H:%M:%S")
-    comments_df["Day"] = comments_df["Date"].dt.day_name()
-    peak_day = comments_df["Day"].value_counts().idxmax()
-    return f"Most comments were posted on {peak_day}."
+    try:
+        # Check if the DataFrame is empty or has no "Date" column
+        if comments_df.empty or "Date" not in comments_df.columns:
+            return "Not enough data available yet. Metrics will appear as more users become active."
+
+        # Parse dates with the correct format
+        comments_df["Date"] = pd.to_datetime(comments_df["Date"], format="%d. %B %Y %H:%M:%S")
+        comments_df["Day"] = comments_df["Date"].dt.day_name()
+
+        # Check if there are any valid days
+        if comments_df["Day"].empty:
+            return "No valid day data available."
+
+        peak_day = comments_df["Day"].value_counts().idxmax()
+        return f"Most comments were posted on {peak_day}."
+    except Exception as e:
+        return f"An error occurred while calculating peak days: {str(e)}"
 
 def get_most_supported_proposals(proposals_df):
-    # Example: Find the most supported proposals
-    most_supported = proposals_df.nlargest(3, "Supporters")
-    return most_supported[["Title", "Supporters"]].to_dict("records")
+    try:
+        # Check if the DataFrame is empty or has no "Supporters" column
+        if proposals_df.empty or "Supporters" not in proposals_df.columns:
+            return [{"Title": "Not enough data available yet.", "Supporters": 0, "URL": "#"}]
+
+        most_supported = proposals_df.nlargest(5, "Supporters")
+        # Convert supporters to integers
+        most_supported["Supporters"] = most_supported["Supporters"].astype(int)
+        return most_supported[["Title", "Supporters", "URL"]].to_dict("records")
+    except Exception as e:
+        return [{"Title": f"An error occurred: {str(e)}", "Supporters": 0, "URL": "#"}]
 
 def get_most_controversial_comments(comments_df):
-    # Example: Find the most controversial comments (high dislikes)
-    comments_df["Controversy"] = comments_df["Dislikes"] / comments_df["Total Votes"]
-    most_controversial = comments_df.nlargest(3, "Controversy")
-    return most_controversial[["Text", "Controversy", "Username", "Total Votes", "Dislikes"]].to_dict("records")
+    try:
+        # Check if the DataFrame is empty or has no "Dislikes" or "Total Votes" columns
+        if comments_df.empty or "Dislikes" not in comments_df.columns or "Total Votes" not in comments_df.columns:
+            return [{"Text": "Not enough data available yet.", "Total Votes": 0, "Dislikes": 0, "Username": "N/A", "Controversy": 0, "URL": "#"}]
+
+        comments_df["Controversy"] = comments_df["Dislikes"] / comments_df["Total Votes"]
+        most_controversial = comments_df.nlargest(5, "Controversy")
+        return most_controversial[["Text", "Controversy", "Username", "Total Votes", "Dislikes", "URL"]].to_dict("records")
+    except Exception as e:
+        return [{"Text": f"An error occurred: {str(e)}", "Total Votes": 0, "Dislikes": 0, "Username": "N/A", "Controversy": 0, "URL": "#"}]
 
 if __name__ == "__main__":
     app.run(debug=True)
