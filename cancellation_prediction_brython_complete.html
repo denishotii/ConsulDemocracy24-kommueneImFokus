@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cancellation Prediction</title>
+  <style>
+    /* Center content and ensure all inputs are stacked vertically */
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh; /* Reduced to 100vh */
+      margin: 0;
+      background-color: #ffffff;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 15px; /* Reduced padding */
+      border-radius: 50px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      max-width: 360px; /* Reduced width for proportional scaling */
+      width: 100%;
+      text-align: center;
+      position: relative;
+    }
+
+
+    /* Gradient border with rounded corners */
+    .container::before {
+      content: "";
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      border-radius: 50px;
+      background: linear-gradient(to right, #6cc404, #0577af);
+      z-index: -1;
+    }
+
+    .py-error {
+      display: none !important;
+    }
+
+    h2 {
+      color: #333;
+      font-size: 1.4em; /* Reduced font size */
+    }
+
+    label {
+      display: block;
+      margin-top: 8px;
+      font-weight: bold;
+      color: #555;
+      font-size: 0.9em; /* Reduced font size */
+    }
+
+    /* Style for input fields and select elements */
+    select,
+    input[type="date"],
+    input[type="time"],
+    input[type="number"] {
+      width: 85%; /* Reduced width slightly */
+      padding: 10px; /* Reduced padding */
+      margin-top: 4px;
+      margin-bottom: 12px; /* Reduced bottom margin */
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      box-sizing: border-box;
+      background-color: #f9f9f9;
+      color: #333;
+      font-size: 14px; /* Reduced font size */
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    select:focus,
+    input[type="date"]:focus,
+    input[type="time"]:focus,
+    input[type="number"]:focus {
+      border-color: #72acce;
+      box-shadow: 0 0 4px rgba(114, 172, 206, 0.4);
+    }
+
+    /* Style for Predict button */
+    button {
+      background-color: #ac589c;
+      color: white;
+      font-size: 14px; /* Reduced font size */
+      cursor: pointer;
+      border: none;
+      border-radius: 18px; /* Slightly smaller border-radius */
+      padding: 8px 18px; /* Reduced padding */
+      width: auto;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #9d4f8d;
+      transform: scale(1.05);
+    }
+
+    #output {
+      font-weight: bold;
+      color: #333;
+      margin-top: 12px; /* Reduced top margin */
+      font-size: 0.9em; /* Reduced font size */
+    }
+  </style>
+</head>
+<body onload="brython()">
+  <div class="container">
+    <h2>Will the customer show up?</h2>
+    <p>Enter the details of your booking to get a cancellation probability:</p>
+
+    <label for="date">Date:</label>
+    <input id="date" type="date" value="2025-02-14">
+
+    <label for="time">Time:</label>
+    <input id="time" type="time" value="17:30">
+
+    <label for="pickup_station">Pickup Station:</label>
+    <select id="pickup_station">
+      <option value="0">Kinding, Bahnhof</option>
+      <option value="1">Enkering, Maibaum</option>
+      <option value="2">Enkering, Feuerwehrhaus</option>
+      <option value="3">Kinding, Beilngrieser Straße</option>
+      <option value="4">Kinding, Marktplatz</option>
+      <option value="5">Kinding, Schule</option>
+      <option value="6">Haunstetten, Kirche</option>
+      <option value="7">Haunstetten, Kuehlerstrasse</option>
+      <option value="8">Haunstetten, Gewerbegebiet</option>
+      <option value="9">Unteremmendorf, Wendeschleife</option>
+      <option value="10">Pfraundorf, Dorfplatz</option>
+      <option value="11">Kratzmuehle, Seerestaurant</option>
+      <option value="12">Badanhausen, Fischerstraße</option>
+      <option value="13">Kirchanhausen</option>
+      <option value="14">Beilngries, Zinnerhof</option>
+      <option value="15">Hirschberg, Dorfkapelle</option>
+      <option value="16">Hirschberg, Fuerstenstrasse</option>
+      <option value="17">Beilngries, Hirschberger Straße</option>
+      <option value="18">Beilngries, Utzmuehlweg</option>
+      <option value="19">Beilngries, Ringstrasse</option> <!-- Default selection -->
+      <option value="20">Beilngries, ZOB</option>
+      <option value="21">Beilngries, Deutscher Hof</option>
+      <option value="22">Beilngries, Kelheimer Straße</option>
+      <option value="23">Beilngries, An der Leitn</option>
+      <option value="24">Beilngries, Gartenstraße</option>
+      <option value="25">Beilngries, Ottmaringer Straße</option>
+      <option value="26">Beilngries, Kanalsiedlung</option>
+      <option value="27">Beilngries, Hafen</option>
+      <option value="28">Beilngries, Neumarkter Straße</option>
+      <option value="29">Beilngries, Rathaus</option>
+      <option value="30">Beilngries, Frauenkirche</option>
+      <option value="31">Beilngries, Eichstaetter Strasse / Tankstelle</option>
+      <option value="32">Beilngries, Gaisbergweg</option>
+      <option value="33">Beilngries, Bauhofstraße</option>
+      <option value="34">Beilngries, Volksfestplatz</option>
+      <option value="35">Beilngries, Freibad</option>
+      <option value="36">Paulushofen, Am Haar</option>
+      <option value="37">Paulushofen, Spielplatz</option>
+      <option value="38">Paulushofen, Dorfstraße</option>
+      <option value="39">Neuzell, Feuerwehr</option>
+      <option value="40">Irfersdorf, Am Kirchplatz</option>
+      <option value="41">Grampersdorf, Kirchstraße</option>
+      <option value="42">Grampersdorf, Landstrasse</option>
+      <option value="43">Grampersdorf, Gewerbegebiet</option>
+      <option value="44">Aschbuch, Altenzeller Weg</option>
+      <option value="45">Aschbuch, Lindenstraße</option>
+      <option value="46">Aschbuch, Waldsiedlung</option>
+      <option value="47">Kirchbuch</option>
+      <option value="48">Arnbuch</option>
+      <option value="49">Wolfsbuch, Am Schacher</option>
+      <option value="50">Wolfsbuch, Fuchsengasse</option>
+      <option value="51">Eglofsdorf, Ortskern</option>
+      <option value="52">Eglofsdorf, B 299</option>
+      <option value="53">Amtmannsdorf</option>
+      <option value="54">Kottingwoerth, Im Hub</option>
+      <option value="55">Kottingwoerth, Dietfurter Strasse</option>
+      <option value="56">Kottingwoerth, Alte Salzstrasse</option>
+      <option value="57">Leising, ABG Tagungszentrum</option>
+      <option value="58">Leising</option>
+      <option value="59">Kevenhuell, Kirche</option>
+      <option value="60">Oberndorf, Kirche</option>
+      <option value="61">Oberndorf, Feuerwehr</option>
+      <option value="62">Goesselthal</option>
+      <option value="63">Biberbach</option>
+      <option value="64">Plankstetten, Biberbacher Straße</option>
+      <option value="65">Litterzhofen, Kirche</option>
+      <option value="66">Wiesenhofen, Kirche</option>
+      <option value="67">Kaldorf</option>
+      <option value="68">Kottingwoerth, Muehlleite</option>
+      <option value="69">Betriebshof Hengl</option>
+    </select>
+
+    <label for="dropoff_station">Dropoff Station:</label>
+    <select id="dropoff_station">
+      <option value="0">Kinding, Bahnhof</option>
+      <option value="1">Enkering, Maibaum</option>
+      <option value="2">Enkering, Feuerwehrhaus</option>
+      <option value="3">Kinding, Beilngrieser Straße</option>
+      <option value="4">Kinding, Marktplatz</option>
+      <option value="5">Kinding, Schule</option>
+      <option value="6">Haunstetten, Kirche</option>
+      <option value="7">Haunstetten, Kuehlerstrasse</option>
+      <option value="8">Haunstetten, Gewerbegebiet</option>
+      <option value="9">Unteremmendorf, Wendeschleife</option>
+      <option value="10">Pfraundorf, Dorfplatz</option>
+      <option value="11">Kratzmuehle, Seerestaurant</option>
+      <option value="12">Badanhausen, Fischerstraße</option>
+      <option value="13">Kirchanhausen</option>
+      <option value="14">Beilngries, Zinnerhof</option>
+      <option value="15">Hirschberg, Dorfkapelle</option>
+      <option value="16">Hirschberg, Fuerstenstrasse</option>
+      <option value="17">Beilngries, Hirschberger Straße</option>
+      <option value="18">Beilngries, Utzmuehlweg</option>
+      <option value="19" selected>Beilngries, Ringstrasse</option> <!-- Default selection -->
+      <option value="20">Beilngries, ZOB</option>
+      <option value="21">Beilngries, Deutscher Hof</option>
+      <option value="22">Beilngries, Kelheimer Straße</option>
+      <option value="23">Beilngries, An der Leitn</option>
+      <option value="24">Beilngries, Gartenstraße</option>
+      <option value="25">Beilngries, Ottmaringer Straße</option>
+      <option value="26">Beilngries, Kanalsiedlung</option>
+      <option value="27">Beilngries, Hafen</option>
+      <option value="28">Beilngries, Neumarkter Straße</option>
+      <option value="29">Beilngries, Rathaus</option>
+      <option value="30">Beilngries, Frauenkirche</option>
+      <option value="31">Beilngries, Eichstaetter Strasse / Tankstelle</option>
+      <option value="32">Beilngries, Gaisbergweg</option>
+      <option value="33">Beilngries, Bauhofstraße</option>
+      <option value="34">Beilngries, Volksfestplatz</option>
+      <option value="35">Beilngries, Freibad</option>
+      <option value="36">Paulushofen, Am Haar</option>
+      <option value="37">Paulushofen, Spielplatz</option>
+      <option value="38">Paulushofen, Dorfstraße</option>
+      <option value="39">Neuzell, Feuerwehr</option>
+      <option value="40">Irfersdorf, Am Kirchplatz</option>
+      <option value="41">Grampersdorf, Kirchstraße</option>
+      <option value="42">Grampersdorf, Landstrasse</option>
+      <option value="43">Grampersdorf, Gewerbegebiet</option>
+      <option value="44">Aschbuch, Altenzeller Weg</option>
+      <option value="45">Aschbuch, Lindenstraße</option>
+      <option value="46">Aschbuch, Waldsiedlung</option>
+      <option value="47">Kirchbuch</option>
+      <option value="48">Arnbuch</option>
+      <option value="49">Wolfsbuch, Am Schacher</option>
+      <option value="50">Wolfsbuch, Fuchsengasse</option>
+      <option value="51">Eglofsdorf, Ortskern</option>
+      <option value="52">Eglofsdorf, B 299</option>
+      <option value="53">Amtmannsdorf</option>
+      <option value="54">Kottingwoerth, Im Hub</option>
+      <option value="55">Kottingwoerth, Dietfurter Strasse</option>
+      <option value="56">Kottingwoerth, Alte Salzstrasse</option>
+      <option value="57">Leising, ABG Tagungszentrum</option>
+      <option value="58">Leising</option>
+      <option value="59">Kevenhuell, Kirche</option>
+      <option value="60">Oberndorf, Kirche</option>
+      <option value="61">Oberndorf, Feuerwehr</option>
+      <option value="62">Goesselthal</option>
+      <option value="63">Biberbach</option>
+      <option value="64">Plankstetten, Biberbacher Straße</option>
+      <option value="65">Litterzhofen, Kirche</option>
+      <option value="66">Wiesenhofen, Kirche</option>
+      <option value="67">Kaldorf</option>
+      <option value="68">Kottingwoerth, Muehlleite</option>
+      <option value="69">Betriebshof Hengl</option>
+    </select>
+
+    <label for="num_passengers">Number of Passengers:</label>
+    <input id="num_passengers" type="number" value="2">
+
+    <button id="predict_button">Predict</button>
+
+    <p id="output">Prediction: </p>
+  </div>
+
+   <!-- Brython Initialization -->
+   <script src="https://cdn.jsdelivr.net/npm/brython@3.10.5/brython.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/brython@3.10.5/brython_stdlib.js"></script>
+ 
+   <!-- Brython Script -->
+   <script type="text/python">
+    from browser import document, console
+    import math
+    
+    # Logistic regression model coefficients (adjusted for better variation)
+    weights = [0.1, -0.2, -0.2, -0.2, -0.2, 0.05, 0.1, -0.01, -0.5]
+    intercept = -0.5  # Increased bias for better spread
+    
+    # Normalize latitude/longitude (approximate min/max values in dataset)
+    def normalize(value, min_value, max_value):
+        return (value - min_value) / (max_value - min_value)
+    
+    # Station coordinates (full list with lat/lon)
+    station_coords = {
+        0: {"lat": 48.992168, "lon": 11.377365},
+        1: {"lat": 48.992498, "lon": 11.363953},
+        2: {"lat": 48.993652, "lon": 11.361228},
+        3: {"lat": 49.002445, "lon": 11.390002},
+        4: {"lat": 49.000562, "lon": 11.38279},
+        5: {"lat": 49.000012, "lon": 11.38727},
+        6: {"lat": 49.015158, "lon": 11.408473},
+        7: {"lat": 49.016552, "lon": 11.413603},
+        8: {"lat": 49.017505, "lon": 11.404733},
+        9: {"lat": 48.992112, "lon": 11.434157},
+        10: {"lat": 49.005142, "lon": 11.445253},
+        11: {"lat": 49.004607, "lon": 11.447705},
+        12: {"lat": 49.017245, "lon": 11.444688},
+        13: {"lat": 49.01912, "lon": 11.458528},
+        14: {"lat": 49.024358, "lon": 11.449795},
+        15: {"lat": 49.03815, "lon": 11.451488},
+        16: {"lat": 49.0366, "lon": 11.454518},
+        17: {"lat": 49.040293, "lon": 11.464213},
+        18: {"lat": 49.039483, "lon": 11.467702},
+        19: {"lat": 49.033832, "lon": 11.471982}
+    }
+    
+    # Min/max lat/lon for normalization
+    MIN_LAT, MAX_LAT = 48.8, 49.2
+    MIN_LON, MAX_LON = 11.3, 11.7
+    
+    def sigmoid(x):
+        """Sigmoid function for logistic regression."""
+        return 1 / (1 + math.exp(-x))
+    
+    def date_to_day_sin_cos(date_str):
+        """Convert date to sine and cosine of the day of the week."""
+        from datetime import datetime
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+        day_of_week = date_obj.weekday()
+        angle = 2 * math.pi * day_of_week / 7
+        return math.sin(angle), math.cos(angle)
+    
+    def time_to_hour_sin_cos(time_str):
+        """Convert time to sine and cosine of the hour of the day."""
+        hour, minute = map(int, time_str.split(":"))
+        time_in_hours = hour + minute / 60
+        angle = 2 * math.pi * time_in_hours / 24
+        return math.sin(angle), math.cos(angle)
+    
+    def get_station_coords(station_id):
+        """Get latitude and longitude for a given station ID."""
+        return station_coords.get(station_id, {"lat": 48.99, "lon": 11.37})  # Default to center
+    
+    def predict(event=None):
+        """Predict the probability of a customer not showing up."""
+        try:
+            date = document["date"].value
+            time = document["time"].value
+            pickup_station = int(document["pickup_station"].value)
+            dropoff_station = int(document["dropoff_station"].value)
+            num_passengers = float(document["num_passengers"].value)
+    
+            # Convert date and time to features
+            DayOfWeek_sin, DayOfWeek_cos = date_to_day_sin_cos(date)
+            Pickup_Hour_sin, Pickup_Hour_cos = time_to_hour_sin_cos(time)
+    
+            # Get and normalize station coordinates
+            pickup_coords = get_station_coords(pickup_station)
+            dropoff_coords = get_station_coords(dropoff_station)
+            
+            pickup_lat = normalize(pickup_coords["lat"], MIN_LAT, MAX_LAT)
+            pickup_lon = normalize(pickup_coords["lon"], MIN_LON, MAX_LON)
+            dropoff_lat = normalize(dropoff_coords["lat"], MIN_LAT, MAX_LAT)
+            dropoff_lon = normalize(dropoff_coords["lon"], MIN_LON, MAX_LON)
+    
+            # Feature vector with normalized lat/lon
+            features = [
+                num_passengers,
+                pickup_lat, pickup_lon,
+                dropoff_lat, dropoff_lon,
+                DayOfWeek_sin, DayOfWeek_cos,
+                Pickup_Hour_sin, Pickup_Hour_cos
+            ]
+    
+            # Compute weighted sum
+            linear_combination = sum(f * w for f, w in zip(features, weights)) + intercept
+    
+            # Compute probability
+            probability = sigmoid(linear_combination) * 100
+    
+            # Display adjusted prediction
+            document["output"].text = f"Customer won't show up with probability: {probability:.2f}%"
+        
+        except Exception as e:
+            console.warn(f"Prediction failed: {e}")
+            document["output"].text = "❌ Prediction failed."
+    
+    # Attach function to button
+    document["predict_button"].bind("click", predict)
+    
+   </script>
+
+</body>
+</html> 

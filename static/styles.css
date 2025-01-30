@@ -345,3 +345,43 @@ footer a:hover {
     color: #555; /* Muted color for supporters */
     margin-left: 10px; /* Space between title and supporters */
 }
+
+/* No Data Message */
+.no-data {
+    font-size: 1.1rem;
+    color: #555;
+    margin: 0;
+}   
+
+
+/* Flex container for side-by-side charts */
+.plots-container {
+    display: flex;
+    justify-content: space-between; /* Space between charts */
+    gap: 20px; /* Adds spacing between items */
+    margin-top: 20px;
+}
+
+/* Individual plot item */
+.plot-item {
+    flex: 1; /* Allow items to take equal space */
+    text-align: center;
+}
+
+/* Ensure images are responsive */
+.plot-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive design: Stack items on smaller screens */
+@media (max-width: 768px) {
+    .plots-container {
+        flex-direction: column; /* Stack on smaller screens */
+    }
+}
+
+
+

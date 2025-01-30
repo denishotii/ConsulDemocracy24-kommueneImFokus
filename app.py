@@ -36,7 +36,12 @@ def index():
         # Filter data for the selected city
         city_projects = projects_df[projects_df["City"] == city]
         city_proposals = proposals_df[proposals_df["City"] == city]
-        city_comments = comments_df[comments_df["City"] == city]
+        city_comments = comments_df[comments_df["City"] == city].copy()
+
+        # Generate charts
+        wordcloud_path = generate_wordcloud(city_comments, city)
+        active_users_plot_path = generate_active_users_plot(city_comments, city)
+        sentiment_plot_path = generate_sentiment_plot(city_comments, city)
 
         # Generate the report data
         data = {
@@ -50,9 +55,9 @@ def index():
             "peak_days": get_peak_days(city_comments),
             "most_supported_proposals": get_most_supported_proposals(city_proposals),
             "most_controversial_comments": get_most_controversial_comments(city_comments),
-            "wordcloud_path": f"static/{city}_wordcloud.png",  # Example path
-            "active_users_plot_path": f"static/{city}_active_users.png",  # Example path
-            "sentiment_plot_path": f"static/{city}_sentiment_distribution.png",  # Example path
+            "wordcloud_path": wordcloud_path or "static/placeholder.png",  # Fallback if no chart
+            "active_users_plot_path": active_users_plot_path or "static/placeholder.png",  # Fallback if no chart
+            "sentiment_plot_path": sentiment_plot_path or "static/placeholder.png",  # Fallback if no chart
         }
 
         # Render the report page with the data
@@ -63,11 +68,17 @@ def index():
 
 @app.route("/download/<city>")
 def download_report(city):
-    # Generate the report data for the selected city
+    # Filter data for the selected city
     city_projects = projects_df[projects_df["City"] == city]
     city_proposals = proposals_df[proposals_df["City"] == city]
     city_comments = comments_df[comments_df["City"] == city]
 
+    # Generate charts
+    wordcloud_path = generate_wordcloud(city_comments, city)
+    active_users_plot_path = generate_active_users_plot(city_comments, city)
+    sentiment_plot_path = generate_sentiment_plot(city_comments, city)
+
+    # Generate the report data
     data = {
         "city": city,
         "date": datetime.now().strftime("%Y-%m-%d"),
@@ -75,14 +86,17 @@ def download_report(city):
         "ai_insights": f"AI-generated insights about civic engagement in {city}.",
         "most_discussed_topics": get_most_discussed_topics(city_comments),
         "most_liked_comments": get_most_liked_comments(city_comments),
+        "total_comments": city_comments.shape[0],  # Get the number of rows (comments)
         "peak_hours": get_peak_hours(city_comments),
         "peak_days": get_peak_days(city_comments),
         "most_supported_proposals": get_most_supported_proposals(city_proposals),
         "most_controversial_comments": get_most_controversial_comments(city_comments),
-        "wordcloud_path": f"static/{city}_wordcloud.png",  # Example path
-        "active_users_plot_path": f"static/{city}_active_users.png",  # Example path
-        "sentiment_plot_path": f"static/{city}_sentiment_distribution.png",  # Example path
+        "wordcloud_path": wordcloud_path or "static/placeholder.png",  # Fallback if no chart
+        "active_users_plot_path": active_users_plot_path or "static/placeholder.png",  # Fallback if no chart
+        "sentiment_plot_path": sentiment_plot_path or "static/placeholder.png",  # Fallback if no chart
     }
+
+    print("Total comments:", city_comments.shape[0])
 
     # Create a Jinja2 environment and pass the url_for function
     env = Environment(loader=FileSystemLoader('templates'))
@@ -104,26 +118,66 @@ def download_report(city):
     return send_file(pdf_file_path, as_attachment=True)
 
 # Helper functions to generate statistics
-def get_most_discussed_topics(comments_df):
+import spacy
+from collections import Counter
+import itertools
+
+# Load spaCy German model
+nlp = spacy.load("de_core_news_sm")
+
+def extract_keywords(text):
+    """Extract meaningful keywords using spaCy (ignores stopwords, particles, and non-alphabetic words)."""
+    if not isinstance(text, str):  # Skip NaN or non-string values
+        return []
+    
+    doc = nlp(text)
+    keywords = [
+        token.lemma_ for token in doc
+        if token.is_alpha and not token.is_stop and token.pos_ in {"NOUN", "PROPN", "ADJ", "VERB"}
+    ]
+    return keywords
+
+
+def extract_ngrams(keywords, n=2):
+    """Generate bigrams or trigrams from extracted keywords."""
+    return [" ".join(ngram) for ngram in zip(*[keywords[i:] for i in range(n)])]
+
+def get_most_discussed_topics(comments_df, top_n=5):
+    """Extract the most discussed topics from the comments."""
     try:
-        # Check if the DataFrame is empty or has no "Text" column
         if comments_df.empty or "Text" not in comments_df.columns:
-            return "Not enough data available yet. Metrics will appear as more users become active."
+            return "Not enough data available yet."
 
-        from collections import Counter
-        import re
+        # Ensure all values in the "Text" column are strings, replacing NaN with empty strings
+        comments_df["Text"] = comments_df["Text"].fillna("").astype(str)
 
-        words = " ".join(comments_df["Text"].dropna()).lower()
-        words = re.findall(r'\b\w+\b', words)
+        # Extract keywords from all comments
+        comments_df["Keywords"] = comments_df["Text"].apply(extract_keywords)
 
-        # Check if there are any words
-        if not words:
-            return "No topics available for analysis."
+        # Flatten keyword lists
+        all_keywords = list(itertools.chain.from_iterable(comments_df["Keywords"]))
 
-        word_counts = Counter(words).most_common(5)
-        return ", ".join([word for word, count in word_counts])
+        # Extract bigrams and trigrams for better topics
+        bigrams = list(itertools.chain.from_iterable(comments_df["Keywords"].apply(lambda x: extract_ngrams(x, n=2))))
+        trigrams = list(itertools.chain.from_iterable(comments_df["Keywords"].apply(lambda x: extract_ngrams(x, n=3))))
+
+        # Count occurrences
+        keyword_counts = Counter(all_keywords).most_common(top_n)
+        bigram_counts = Counter(bigrams).most_common(top_n)
+        trigram_counts = Counter(trigrams).most_common(top_n)
+
+        # Combine single keywords, bigrams, and trigrams for diversity
+        topics = [word for word, _ in keyword_counts] + [phrase for phrase, _ in bigram_counts] + [phrase for phrase, _ in trigram_counts]
+
+        return ", ".join(topics[:top_n]) if topics else "No significant topics found."
+
     except Exception as e:
-        return f"An error occurred while calculating most discussed topics: {str(e)}"
+        return f"Error extracting discussed topics: {str(e)}"
+
+
+    except Exception as e:
+        return f"Error extracting discussed topics: {str(e)}"
+
 
 def get_most_liked_comments(comments_df):
     try:
@@ -138,41 +192,47 @@ def get_most_liked_comments(comments_df):
 
 def get_peak_hours(comments_df):
     try:
-        # Check if the DataFrame is empty or has no "Date" column
         if comments_df.empty or "Date" not in comments_df.columns:
-            return "Not enough data available yet. Metrics will appear as more users become active."
+            return "Not enough data available yet."
 
-        # Parse dates with the correct format
-        comments_df["Date"] = pd.to_datetime(comments_df["Date"], format="%d. %B %Y %H:%M:%S")
+        # Try parsing with day-first and automatic format detection
+        comments_df["Date"] = pd.to_datetime(comments_df["Date"], dayfirst=True, errors="coerce")
+
+        # Drop rows where parsing failed
+        comments_df = comments_df.dropna(subset=["Date"])
+
         comments_df["Hour"] = comments_df["Date"].dt.hour
 
-        # Check if there are any valid hours
         if comments_df["Hour"].empty:
             return "No valid time data available."
 
         peak_hours = comments_df["Hour"].value_counts().idxmax()
         return f"Most comments were posted at {peak_hours}:00."
     except Exception as e:
-        return f"An error occurred while calculating peak hours: {str(e)}"
+        return f"Error while calculating peak hours: {str(e)}"
+
 
 def get_peak_days(comments_df):
     try:
-        # Check if the DataFrame is empty or has no "Date" column
         if comments_df.empty or "Date" not in comments_df.columns:
-            return "Not enough data available yet. Metrics will appear as more users become active."
+            return "Not enough data available yet."
 
-        # Parse dates with the correct format
-        comments_df["Date"] = pd.to_datetime(comments_df["Date"], format="%d. %B %Y %H:%M:%S")
+        # Try parsing with day-first and automatic format detection
+        comments_df["Date"] = pd.to_datetime(comments_df["Date"], dayfirst=True, errors="coerce")
+
+        # Drop rows where parsing failed
+        comments_df = comments_df.dropna(subset=["Date"])
+
         comments_df["Day"] = comments_df["Date"].dt.day_name()
 
-        # Check if there are any valid days
         if comments_df["Day"].empty:
             return "No valid day data available."
 
         peak_day = comments_df["Day"].value_counts().idxmax()
         return f"Most comments were posted on {peak_day}."
     except Exception as e:
-        return f"An error occurred while calculating peak days: {str(e)}"
+        return f"Error while calculating peak days: {str(e)}"
+
 
 def get_most_supported_proposals(proposals_df):
     try:
@@ -185,7 +245,7 @@ def get_most_supported_proposals(proposals_df):
         most_supported["Supporters"] = most_supported["Supporters"].astype(int)
         return most_supported[["Title", "Supporters", "URL"]].to_dict("records")
     except Exception as e:
-        return [{"Title": f"An error occurred: {str(e)}", "Supporters": 0, "URL": "#"}]
+        return [{"Title": "Not enough data available yet.", "Supporters": 0, "URL": "#"}]
 
 def get_most_controversial_comments(comments_df):
     try:
@@ -198,6 +258,113 @@ def get_most_controversial_comments(comments_df):
         return most_controversial[["Text", "Controversy", "Username", "Total Votes", "Dislikes", "URL"]].to_dict("records")
     except Exception as e:
         return [{"Text": f"An error occurred: {str(e)}", "Total Votes": 0, "Dislikes": 0, "Username": "N/A", "Controversy": 0, "URL": "#"}]
+
+import matplotlib
+matplotlib.use('Agg')  # Use the Agg backend for plotting (no UI)
+import matplotlib.pyplot as plt
+import seaborn as sns
+from wordcloud import WordCloud
+import numpy as np
+
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+import os
+
+def generate_wordcloud(comments_df, city):
+    """Generate a WordCloud image from meaningful keywords extracted with spaCy."""
+    try:
+        if comments_df.empty or "Text" not in comments_df.columns:
+            return None  # No data, return None
+
+        # Ensure all values in the "Text" column are strings, replacing NaN with empty strings
+        comments_df["Text"] = comments_df["Text"].fillna("").astype(str)
+
+        # Extract keywords from all comments
+        comments_df["Keywords"] = comments_df["Text"].apply(extract_keywords)
+
+        # Flatten keyword lists into a single text
+        all_keywords_text = " ".join(itertools.chain.from_iterable(comments_df["Keywords"]))
+
+        if not all_keywords_text.strip():  # If no meaningful words, return None
+            return None
+
+        # Generate WordCloud
+        wordcloud = WordCloud(
+            width=800, height=400, background_color='white', colormap="viridis"
+        ).generate(all_keywords_text)
+
+        # Save WordCloud as an image
+        wordcloud_path = f"static/{city}_wordcloud.png"
+        wordcloud.to_file(wordcloud_path)
+        return wordcloud_path
+
+    except Exception as e:
+        print(f"Error generating word cloud: {e}")
+        return None
+
+
+
+def generate_active_users_plot(comments_df, city):
+    try:
+        if comments_df.empty or "Date" not in comments_df.columns:
+            return None  # No data, return None
+
+        # Try parsing with automatic format detection
+        comments_df["Date"] = pd.to_datetime(comments_df["Date"], dayfirst=True, errors="coerce")
+
+        # Drop rows where parsing failed
+        comments_df = comments_df.dropna(subset=["Date"])
+
+        if comments_df.empty:
+            return None  # No valid data to plot
+
+        comments_df["Hour"] = comments_df["Date"].dt.hour
+        active_users = comments_df["Hour"].value_counts().sort_index()
+
+        if active_users.empty:
+            return None  # No valid data to plot
+
+        plt.figure(figsize=(10, 6))
+        sns.lineplot(x=active_users.index, y=active_users.values)
+        plt.title("Active Users Over Time")
+        plt.xlabel("Hour of the Day")
+        plt.ylabel("Number of Comments")
+        plt.xticks(np.arange(0, 24, 1))
+
+        active_users_plot_path = f"static/{city}_active_users.png"
+        plt.savefig(active_users_plot_path)
+        plt.close()
+        return active_users_plot_path
+    except Exception as e:
+        print(f"Error generating active users plot: {e}")
+        return None
+
+
+def generate_sentiment_plot(comments_df, city):
+    try:
+        if comments_df.empty:
+            return None  # No data, return None
+
+        sentiment_scores = np.random.normal(0, 1, len(comments_df))  # Placeholder for actual sentiment data
+        if len(sentiment_scores) == 0:
+            return None  # No data, return None
+
+        plt.figure(figsize=(6, 4))
+        sns.histplot(sentiment_scores, bins=20, kde=True)
+        plt.title("Sentiment Distribution")
+        plt.xlabel("Sentiment Score")
+        plt.ylabel("Frequency")
+
+        sentiment_plot_path = f"static/{city}_sentiment_distribution.png"
+        plt.savefig(sentiment_plot_path)
+        plt.close()
+        return sentiment_plot_path
+    except Exception as e:
+        print(f"Error generating sentiment plot: {e}")
+        return None
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
