@@ -1,7 +1,7 @@
 -- Create the database and tables for the CitizenParticipation project
 
 CREATE DATABASE CitizenParticipation
-    DEFAULT CHARACTER SET = 'utf8mb4';
+    DEFAULT CHARACTER SET = 'utf16';
 USE CitizenParticipation;
 
 -- Table for storing cities
@@ -14,7 +14,7 @@ CREATE TABLE Cities (
 CREATE TABLE Projects (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    description TEXT,
+    description MEDIUMTEXT,
     city_id INT,
     proposal_count INT DEFAULT 0,
     project_url TEXT,
@@ -32,21 +32,21 @@ CREATE TABLE Users (
 CREATE TABLE Proposals (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    description TEXT,
+    description MEDIUMTEXT,
     project_id INT,
     author_id INT,
     city_id INT,
     supporters INT DEFAULT 0,
     proposal_url TEXT,
     FOREIGN KEY (project_id) REFERENCES Projects(id) ON DELETE CASCADE,
-    FOREIGN KEY (author_id) REFERENCES Users(id) ON DELETE SET NULL
+    FOREIGN KEY (author_id) REFERENCES Users(id) ON DELETE SET NULL,
     FOREIGN KEY (city_id) REFERENCES Cities(id) ON DELETE CASCADE
 );
 
 -- Table for storing comments on projects and proposals
 CREATE TABLE Comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    text TEXT NOT NULL,
+    text MEDIUMTEXT NOT NULL,
     user_id INT,
     project_id INT NULL,
     proposal_id INT NULL,

@@ -9,10 +9,9 @@ import locale
 locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
 
 # Load CSV data
-siegburg_data = pd.read_csv('siegburg_data.csv')
-all_proposals = pd.read_csv('all_proposals.csv')
-all_projects = pd.read_csv('all_projects.csv')
-all_comments = pd.read_csv('all_comments.csv')
+all_proposals = pd.read_csv('data/all_proposals.csv')
+all_projects = pd.read_csv('data/all_projects.csv')
+all_comments = pd.read_csv('data/all_comments.csv')
 
 
 # Connect to MySQL database
@@ -43,17 +42,14 @@ def insert_cities():
 insert_cities()
 
 # Insert unique users into the database
-def insert_users():
-    siegburg_users = siegburg_data[['Username', 'Konto Status']].rename(columns={'Username': 'username', 'Konto Status': 'verified_status'})
-    siegburg_users['verified_status'] = siegburg_users['verified_status'].apply(lambda x: 'verified' if x == 'Verifiziert' else 'not verified')
-    
+def insert_users():    
     proposal_users = all_proposals[['Author']].rename(columns={'Author': 'username'})
     proposal_users['verified_status'] = 'not verified'
     
     comment_users = all_comments[['Username']].rename(columns={'Username': 'username'})
     comment_users['verified_status'] = 'not verified'
     
-    users = pd.concat([siegburg_users, proposal_users, comment_users]).fillna('Unknown').drop_duplicates()
+    users = pd.concat([proposal_users, comment_users]).fillna('Unknown').drop_duplicates()
     
     for _, row in users.iterrows():
         cursor.execute("INSERT INTO Users (username, verified_status) VALUES (%s, %s) ON DUPLICATE KEY UPDATE username=username", (row['username'], row['verified_status']))
