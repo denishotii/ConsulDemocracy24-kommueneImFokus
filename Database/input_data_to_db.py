@@ -50,6 +50,7 @@ def insert_users():
     comment_users['verified_status'] = 'not verified'
     
     users = pd.concat([proposal_users, comment_users]).fillna('Unknown').drop_duplicates()
+    users['username'] = users['username'].str.strip()
     
     for _, row in users.iterrows():
         cursor.execute("INSERT INTO Users (username, verified_status) VALUES (%s, %s) ON DUPLICATE KEY UPDATE username=username", (row['username'], row['verified_status']))

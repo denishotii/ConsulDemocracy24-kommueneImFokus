@@ -32,7 +32,7 @@ CREATE TABLE Users (
 CREATE TABLE Proposals (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    description MEDIUMTEXT,
+     description MEDIUMTEXT NULL,
     project_id INT,
     author_id INT,
     city_id INT,
