@@ -48,7 +48,7 @@ def index():
             "city": city,
             "date": datetime.now().strftime("%Y-%m-%d"),
             "summary": f"This is a summary of civic engagement in {city}.",
-            "ai_insights": f"AI-generated insights about civic engagement in {city}.",
+            "ai_insights": f"Insights about civic engagement in {city}.",
             "most_discussed_topics": get_most_discussed_topics(city_comments),
             "most_liked_comments": get_most_liked_comments(city_comments),
             "peak_hours": get_peak_hours(city_comments),
@@ -83,7 +83,7 @@ def download_report(city):
         "city": city,
         "date": datetime.now().strftime("%Y-%m-%d"),
         "summary": f"This is a summary of civic engagement in {city}.",
-        "ai_insights": f"AI-generated insights about civic engagement in {city}.",
+        "ai_insights": f"Insights about civic engagement in {city}.",
         "most_discussed_topics": get_most_discussed_topics(city_comments),
         "most_liked_comments": get_most_liked_comments(city_comments),
         "total_comments": city_comments.shape[0],  # Get the number of rows (comments)

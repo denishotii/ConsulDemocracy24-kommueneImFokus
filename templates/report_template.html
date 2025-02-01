@@ -9,9 +9,12 @@
 </head>
 <body>
     <header>
-        <img src="{{ url_for('static', filename='consul-logo.png') }}" alt="Consul Logo" class="logo">
-        <h1>{{ data.city }} Civic Engagement Report</h1>
+        <a href="{{ url_for('index') }}">
+            <img src="{{ url_for('static', filename='consul-logo.png') }}" alt="Consul Logo" class="logo">
+        </a>
+        <h1 class="city-title">{{ data.city }} Civic Engagement Report</h1>
     </header>
+    
 
     <div class="container">
         <!-- Summary and AI Insights -->
