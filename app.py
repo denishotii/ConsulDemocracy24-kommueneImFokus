@@ -122,20 +122,29 @@ import spacy
 from collections import Counter
 import itertools
 
-# Load spaCy German model
-nlp = spacy.load("de_core_news_sm")
+# Global variable, but lazy-loaded
+_spacy_model = None
+
+def get_nlp():
+    """Load spaCy model only once and reuse it."""
+    global _spacy_model
+    if _spacy_model is None:
+        _spacy_model = spacy.load("de_core_news_sm")
+    return _spacy_model
 
 def extract_keywords(text):
-    """Extract meaningful keywords using spaCy (ignores stopwords, particles, and non-alphabetic words)."""
-    if not isinstance(text, str):  # Skip NaN or non-string values
+    """Extract keywords while reusing a single spaCy instance."""
+    if not isinstance(text, str):
         return []
     
+    nlp = get_nlp()
     doc = nlp(text)
     keywords = [
         token.lemma_ for token in doc
         if token.is_alpha and not token.is_stop and token.pos_ in {"NOUN", "PROPN", "ADJ", "VERB"}
     ]
     return keywords
+
 
 
 def extract_ngrams(keywords, n=2):
