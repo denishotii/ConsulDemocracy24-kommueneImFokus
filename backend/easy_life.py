@@ -2,27 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 
 urls = [
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     'https://mitmachen.siegburg.de/angebotslandkarte',
     'https://mitmachen.jena.de/projekts',
     'https://mitreden.ilzerland.bayern/projekts'
-=======
-    #'https://mitmachen.siegburg.de/angebotslandkarte',
-    'https://mitmachen.jena.de/projekts',
-    #'https://mitreden.ilzerland.bayern/projekts'
->>>>>>> 402f046 (Seperate py)
-=======
-    #'https://mitmachen.siegburg.de/angebotslandkarte',
-    'https://mitmachen.jena.de/projekts',
-    #'https://mitreden.ilzerland.bayern/projekts'
->>>>>>> 402f046 (Seperate py)
-=======
-    'https://mitmachen.siegburg.de/angebotslandkarte',
-    'https://mitmachen.jena.de/projekts',
-    'https://mitreden.ilzerland.bayern/projekts'
->>>>>>> ba7167e (Roughly ready scraping)
 ]
 
 def def_42(urls):
@@ -91,56 +73,18 @@ def jena_data(soup):
 def ilzerland_data(soup):
     links = []
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     a_tags = soup.find_all('a',  class_='resource-item--title')
-=======
-    a_tags = soup.find_all('a',  class_='resources-list--inner')
->>>>>>> 402f046 (Seperate py)
-=======
-    a_tags = soup.find_all('a',  class_='resources-list--inner')
->>>>>>> 402f046 (Seperate py)
-=======
-    a_tags = soup.find_all('a',  class_='resource-item--title')
->>>>>>> ba7167e (Roughly ready scraping)
 
     for tag in a_tags:
         href = tag.get('href')
         
         if href:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
             link = 'https://mitreden.ilzerland.bayern' + href
-=======
-            link = 'https://mitmachen.ilzerland.de' + href
-            
->>>>>>> 402f046 (Seperate py)
-=======
-            link = 'https://mitmachen.ilzerland.de' + href
-            
->>>>>>> 402f046 (Seperate py)
-=======
-            link = 'https://mitreden.ilzerland.bayern' + href
->>>>>>> ba7167e (Roughly ready scraping)
             if not link in links:
                 links.append(link)
     
     link_and_content = content_scraper(soup, links, 'ilzerland')
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     
-=======
-    print(link_and_content)
->>>>>>> 402f046 (Seperate py)
-=======
-    print(link_and_content)
->>>>>>> 402f046 (Seperate py)
-=======
-    
->>>>>>> ba7167e (Roughly ready scraping)
     return link_and_content
 
 def content_scraper(soup, links, identifier):
