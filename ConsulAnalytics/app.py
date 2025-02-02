@@ -12,8 +12,8 @@ locale.setlocale(locale.LC_TIME, "de_DE")
 app = Flask(__name__)
 
 # Specify the path to wkhtmltopdf
-wkhtmltopdf_path = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'  # Update this path
-pdfkit_config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
+# wkhtmltopdf_path = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'  # Update this path
+# pdfkit_config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
 
 # List of cities (excluding Flensburg)
 CITIES = [
@@ -108,11 +108,11 @@ def download_report(city):
 
     # Convert HTML to PDF
     pdf_file_path = f"templates/{city}_report.pdf"
-    pdfkit.from_string(html_out, pdf_file_path, configuration=pdfkit_config, options={
-        'quiet': '',
-        'enable-local-file-access': '',  # Allow access to local files
-        'no-pdf-compression': '',  # Disable PDF compression
-    })
+    # pdfkit.from_string(html_out, pdf_file_path, configuration=pdfkit_config, options={
+    #     'quiet': '',
+    #     'enable-local-file-access': '',  # Allow access to local files
+    #     'no-pdf-compression': '',  # Disable PDF compression
+    # })
 
     # Send the PDF file for download
     return send_file(pdf_file_path, as_attachment=True)
